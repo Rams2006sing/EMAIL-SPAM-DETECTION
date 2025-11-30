@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spade - Intelligent Spam Detection</title>
+    <style>
+        /* Modern Dashboard CSS */
+        :root { 
+            --primary: #4F46E5; 
+            --bg: #F3F4F6; 
+            --card: #FFFFFF; 
+            --text: #1F2937; 
+            --danger: #EF4444; 
+            --success: #10B981; 
+            --neutral: #6B7280;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 40px 20px; 
+        }
+        
+        .main-wrapper { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            display: grid; 
+            gap: 25px; 
+        }
+        
+        /* Card Style */
+        .card { 
+            background: var(--card); 
+            padding: 35px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        h1 { 
+            margin-top: 0; 
+            color: var(--primary); 
+            font-size: 2.2rem; 
+            margin-bottom: 5px;
+        }
+        
+        h2 { 
+            font-size: 1.3rem; 
+            border-bottom: 2px solid #F3F4F6; 
+            padding-bottom: 15px; 
+            margin-bottom: 25px; 
+            color: #374151;
+        }
+        
+        p.subtitle { 
+            color: var(--neutral); 
+            margin-bottom: 30px; 
+            font-size: 1.1rem;
+        }
+
+        /* Input Form */
+        textarea { 
+            width: 100%; 
+            height: 160px; 
+            padding: 15px; 
+            border: 2px solid #E5E7EB; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-family: inherit;
+            box-sizing: border-box; 
+            resize: vertical; 
+            transition: 0.2s; 
+        }
+        
+        textarea:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        button { 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 14px 30px; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            width: 100%; 
+            font-size: 1.1rem; 
+            transition: 0.2s; 
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover { 
+            background-color: #4338CA; 
+            transform: translateY(-1px);
+        }
+
+        /* Prediction Result Area */
+        .result-header { 
+            text-align: center; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 30px; 
+            color: white; 
+            font-weight: 800; 
+            font-size: 1.8rem; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .is-spam { background-color: var(--danger); box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4); }
+        .is-ham { background-color: var(--success); box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4); }
+
+        /* Progress Bars */
+        .bar-container { margin-bottom: 20px; }
+        
+        .bar-label { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            font-size: 0.95rem;
+        }
+        
+        .progress-track { 
+            background-color: #F3F4F6; 
+            height: 12px; 
+            border-radius: 6px; 
+            overflow: hidden; 
+        }
+        
+        .progress-fill { 
+            height: 100%; 
+            border-radius: 6px; 
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        
+        /* Insights / Entity Expanders */
+        details { 
+            border: 1px solid #E5E7EB; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            overflow: hidden; 
+            background-color: #FAFAFA;
+        }
+        
+        summary { 
+            background-color: #FFFFFF; 
+            padding: 18px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            user-select: none; 
+            transition: 0.2s; 
+            color: #374151;
+            list-style: none; /* Hide default triangle */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Custom arrow for summary */
+        summary::after {
+            content: '+'; 
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neutral);
+        }
+        
+        details[open] summary::after {
+            content: '-';
+        }
+        
+        summary:hover { background-color: #F9FAFB; }
+        
+        .tags-box { 
+            padding: 20px; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            border-top: 1px solid #E5E7EB;
+        }
+        
+        .tag { 
+            background-color: #FFFFFF; 
+            color: var(--primary); 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 0.9rem; 
+            border: 1px solid #E0E7FF;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--neutral);
+            padding: 30px;
+            font-style: italic;
+            background: #FAFAFA;
+            border-radius: 10px;
+            border: 1px dashed #E5E7EB;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    
+    <div class="card">
+        <h1>♠️ Spade</h1>
+        <p class="subtitle">Advanced Spam Detection System</p>
+        
+        <form action="/predict" method="POST">
+            <textarea name="message" placeholder="Paste the email content here for analysis..." required>{{ message }}</textarea>
+            <button type="submit">DETECT SPAM</button>
+        </form>
+    </div>
+
+    {% if prediction %}
+    <div class="card">
+        <h2>Analysis Results</h2>
+        
+        <div class="result-header {% if is_spam %}is-spam{% else %}is-ham{% endif %}">
+            {{ prediction }}
+        </div>
+
+        <div class="bar-container">
+            <div class="bar-label">
+                <span>Spam Probability</span>
+                <span>{{ spam_score }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width: {{ spam_score }}%; background-color: #EF4444;"></div>
+            </div>
+        </div>
+
+        <div class="bar-container">
+            <div class="bar-label">
+                <span>Legit (Ham) Probability</span>
+                <span>{{ ham_score }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width: {{ ham_score }}%; background-color: #10B981;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🔍 Text Insights & Entities</h2>
+        <p style="font-size: 0.95rem; color: #666; margin-bottom: 25px; line-height: 1.5;">
+            The system extracted the following <strong>key indicators</strong> from the text. 
+            Common spam often contains specific patterns of money, urgent dates, or unknown entities.
+        </p>
+
+        {% if insights %}
+            {% for category, items in insights.items() %}
+            <details open>
+                <summary>
+                    <span>{{ category }}</span>
+                    <span style="font-weight: 400; color: #9CA3AF; font-size: 0.9rem;">{{ items|length }} found</span>
+                </summary>
+                <div class="tags-box">
+                    {% for item in items %}
+                        <span class="tag">{{ item }}</span>
+                    {% endfor %}
+                </div>
+            </details>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                No specific entities (like Dates, Money, or Numbers) were found in this text.
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
